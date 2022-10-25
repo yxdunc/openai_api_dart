@@ -1,11 +1,14 @@
 import 'package:json_annotation/json_annotation.dart';
 
+import 'openai_gpt3_api.dart';
+
 part 'completion.g.dart';
 
 @JsonSerializable(createFactory: false)
 class CompletionApiParameters {
-  CompletionApiParameters(this.prompt,
-      {this.maxTokens = 16,
+  CompletionApiParameters(this.prompt, {
+    this.model = Engine.text_davinci_002,
+      this.maxTokens = 16,
       this.temperature = 1,
       this.topP = 1,
       this.n = 1,
@@ -16,9 +19,11 @@ class CompletionApiParameters {
       this.presencePenalty = 0,
       this.frequencyPenalty = 0,
       this.bestOf = 1,
-      this.logitBias});
+      this.logitBias,
+  });
 
   final String prompt;
+  final Engine model;
   final int maxTokens;
   final num temperature;
   final num topP;

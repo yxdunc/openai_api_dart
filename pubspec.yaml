@@ -1,7 +1,7 @@
-name: openai_gpt3_api
+name: openai_api
 description: A wrapper for the HTTP calls to the OpenAI API for the language model GPT-3.
 version: 0.1.3
-homepage: 'https://github.com/morriskurz/openai_gpt3_dart_api'
+homepage: 'https://github.com/yxdunc/openai_api_dart'
 
 environment:
   sdk: ">=2.12.0 <3.0.0"

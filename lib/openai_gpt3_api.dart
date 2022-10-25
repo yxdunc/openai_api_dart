@@ -3,11 +3,8 @@ import 'dart:core';
 
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
+import 'package:json_annotation/json_annotation.dart';
 import 'package:openai_gpt3_api/files.dart';
-import 'package:openai_gpt3_api/search.dart';
-
-import 'answer.dart';
-import 'classification.dart';
 import 'completion.dart';
 import 'invalid_request_exception.dart';
 
@@ -21,14 +18,8 @@ class GPT3 {
   /// to your flutter arguments.
   GPT3(String apiKey) : apiKey = apiKey;
 
-  Uri _getUri(String apiEndpoint, [Engine engine = Engine.davinci]) {
-    if (apiEndpoint == 'classifications' ||
-        apiEndpoint == 'answers' ||
-        apiEndpoint.startsWith('files')) {
-      return Uri.https('api.openai.com', '/v1/$apiEndpoint');
-    }
-    return Uri.https(
-        'api.openai.com', '/v1/engines/${engine.toString()}/$apiEndpoint');
+  Uri _getUri(String apiEndpoint) {
+    return Uri.https('api.openai.com', '/v1/$apiEndpoint');
   }
 
   /// Post a HTTP call to the given [url] with the data object [body].
@@ -64,13 +55,14 @@ class GPT3 {
       bool stream = false,
       int? logProbs,
       bool echo = false,
-      Engine engine = Engine.davinci,
+      Engine engine = Engine.text_davinci_002,
       String? stop,
       num presencePenalty = 0,
       num frequencyPenalty = 0,
       int bestOf = 1,
       Map<String, num>? logitBias}) async {
     var data = CompletionApiParameters(prompt,
+        model: engine,
         maxTokens: maxTokens,
         temperature: temperature,
         bestOf: bestOf,
@@ -85,127 +77,11 @@ class GPT3 {
         topP: topP);
 
     var reqData = data.toJson();
-    var response = await _postHttpCall(_getUri('completions', engine), reqData);
+    print(reqData);
+    var response = await _postHttpCall(_getUri('completions'), reqData);
     Map<String, dynamic> map = json.decode(response.body);
     _catchExceptions(map);
     return CompletionApiResult.fromJson(map);
-  }
-
-  /// Given a query and a set of documents or labels, the model ranks each
-  /// document based on its semantic similarity to the provided [query].
-  ///
-  /// If [documents] and [file] are both null or both not-null, a [ArgumentError] is thrown.
-  /// Throws an [InvalidRequestException] if something goes wrong on the backend.
-  /// For more information, refer to [the OpenAI documentation](https://beta.openai.com/docs/api-reference/searches)
-  Future<SearchApiResult> search(String query,
-      {List<String>? documents,
-      String? file,
-      int maxRerank = 200,
-      bool returnMetadata = false,
-      Engine engine = Engine.davinci}) async {
-    var data = SearchApiParameters(query,
-        documents: documents,
-        file: file,
-        maxRerank: maxRerank,
-        returnMetadata: returnMetadata);
-    var reqData = data.toJson();
-    var response = await _postHttpCall(_getUri('search', engine), reqData);
-    Map<String, dynamic> map = json.decode(response.body);
-    _catchExceptions(map);
-    return SearchApiResult.fromJson(map);
-  }
-
-  /// Classifies the specified query using provided examples.
-  ///
-  /// The endpoint first searches over the labeled examples to select the
-  /// ones most relevant for the particular query. Then, the relevant examples
-  /// are combined with the query to construct a prompt to produce the final
-  /// label via the completions endpoint.
-  ///
-  /// Labeled examples can be provided via an uploaded file, or explicitly
-  /// listed in the request using the examples parameter for quick tests
-  /// and small scale use cases.
-  ///
-  /// If [examples] and [file] are both null or both not-null, a [ArgumentError] is thrown.
-  /// Throws an [InvalidRequestException] if something goes wrong on the backend.
-  ///
-  /// For more information, refer to [the OpenAI documentation](https://beta.openai.com/docs/api-reference/classifications)
-  Future<ClassificationApiResult> classification(Engine model, String query,
-      {List<List<String>>? examples,
-      String? file,
-      List<String>? labels,
-      Engine searchModel = Engine.ada,
-      num temperature = 0,
-      int? logprobs,
-      int maxExamples = 200,
-      Map<String, num>? logitBias,
-      bool returnPrompt = false,
-      bool returnMetadata = false,
-      List<String>? expand}) async {
-    var data = ClassificationApiParameters(model.toString(), query,
-        returnMetadata: returnMetadata,
-        file: file,
-        logitBias: logitBias,
-        temperature: temperature,
-        examples: examples,
-        expand: expand,
-        labels: labels,
-        logprobs: logprobs,
-        maxExamples: maxExamples,
-        returnPrompt: returnPrompt,
-        searchModel: searchModel.toString());
-    var reqData = data.toJson();
-    var response = await _postHttpCall(_getUri('classifications'), reqData);
-    Map<String, dynamic> map = json.decode(response.body);
-    _catchExceptions(map);
-    return ClassificationApiResult.fromJson(map);
-  }
-
-  /// Answers the specified question using the provided documents and examples.
-  ///
-  /// The endpoint first searches over provided documents or files to find
-  /// relevant context. The relevant context is combined with the provided
-  /// examples and question to create the prompt for completion.
-  ///
-  /// If [documents] and [file] are both null or both not-null, a [ArgumentError] is thrown.
-  /// Throws an [InvalidRequestException] if something goes wrong on the backend.
-  ///
-  /// For more information, refer to [the OpenAI documentation](https://beta.openai.com/docs/api-reference/answers)
-  Future<AnswerApiResult> answer(Engine model, String question,
-      List<List<String>> examples, String examplesContext,
-      {List<String>? documents,
-      String? file,
-      Engine searchModel = Engine.ada,
-      int maxRerank = 200,
-      num temperature = 0,
-      int? logprobs,
-      int maxTokens = 16,
-      List<String>? stop,
-      int n = 1,
-      Map<String, num>? logitBias,
-      bool returnMetadata = false,
-      bool returnPrompt = false,
-      List<String>? expand}) async {
-    var data = AnswerApiParameters(
-        model.toString(), question, examples, examplesContext,
-        documents: documents,
-        file: file,
-        searchModel: searchModel.toString(),
-        maxRerank: maxRerank,
-        temperature: temperature,
-        logprobs: logprobs,
-        maxTokens: maxTokens,
-        stop: stop,
-        n: n,
-        logitBias: logitBias,
-        returnPrompt: returnPrompt,
-        returnMetadata: returnMetadata,
-        expand: expand);
-    var reqData = data.toJson();
-    var response = await _postHttpCall(_getUri('answers'), reqData);
-    Map<String, dynamic> map = json.decode(response.body);
-    _catchExceptions(map);
-    return AnswerApiResult.fromJson(map);
   }
 
   /// Returns a list of files that belong to the user's organization.
@@ -279,16 +155,13 @@ class GPT3 {
 /// The OpenAI GPT-3 engine used in the API call.
 ///
 /// For more information on the engines, refer to [the OpenAI documentation](https://beta.openai.com/docs/engines).
-class Engine {
-  static const ada = Engine._('text-ada-001');
-  static const babbage = Engine._('text-babbage-001');
-  static const curie = Engine._('text-curie-001');
-  static const davinci = Engine._('text-davinci-002');
-
-  final String _string;
-
-  const Engine._(this._string);
-
-  @override
-  String toString() => _string;
+enum Engine {
+  @JsonValue('text-ada-001')
+  text_ada_001,
+  @JsonValue('text-babbage-001')
+  text_babbage_001,
+  @JsonValue('text-curie-001')
+  text_curie_001,
+  @JsonValue('text-davinci-002')
+  text_davinci_002,
 }

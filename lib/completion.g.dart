@@ -10,6 +10,7 @@ Map<String, dynamic> _$CompletionApiParametersToJson(
     CompletionApiParameters instance) {
   final val = <String, dynamic>{
     'prompt': instance.prompt,
+    'model': _$EngineEnumMap[instance.model],
     'max_tokens': instance.maxTokens,
     'temperature': instance.temperature,
     'top_p': instance.topP,
@@ -32,6 +33,13 @@ Map<String, dynamic> _$CompletionApiParametersToJson(
   writeNotNull('logit_bias', instance.logitBias);
   return val;
 }
+
+const _$EngineEnumMap = {
+  Engine.text_ada_001: 'text-ada-001',
+  Engine.text_babbage_001: 'text-babbage-001',
+  Engine.text_curie_001: 'text-curie-001',
+  Engine.text_davinci_002: 'text-davinci-002',
+};
 
 CompletionApiResult _$CompletionApiResultFromJson(Map<String, dynamic> json) =>
     CompletionApiResult(
