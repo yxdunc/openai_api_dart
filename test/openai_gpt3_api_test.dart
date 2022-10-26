@@ -1,5 +1,5 @@
-import 'package:openai_gpt3_api/invalid_request_exception.dart';
-import 'package:openai_gpt3_api/openai_gpt3_api.dart';
+import 'package:openai_api/invalid_request_exception.dart';
+import 'package:openai_api/openai_gpt3_api.dart';
 import 'package:test/test.dart';
 
 void main() {

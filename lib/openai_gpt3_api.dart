@@ -4,7 +4,7 @@ import 'dart:core';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:openai_gpt3_api/files.dart';
+import 'package:openai_api/files.dart';
 import 'completion.dart';
 import 'invalid_request_exception.dart';
 
@@ -48,7 +48,8 @@ class GPT3 {
   ///
   /// For more information, refer to [the OpenAI documentation](https://beta.openai.com/docs/api-reference/completions/create).
   Future<CompletionApiResult> completion(String prompt,
-      {int maxTokens = 16,
+      {String? suffix,
+      int maxTokens = 16,
       num temperature = 1,
       num topP = 1,
       int n = 1,
@@ -57,24 +58,29 @@ class GPT3 {
       bool echo = false,
       Engine engine = Engine.text_davinci_002,
       String? stop,
+      String? user,
       num presencePenalty = 0,
       num frequencyPenalty = 0,
       int bestOf = 1,
       Map<String, num>? logitBias}) async {
-    var data = CompletionApiParameters(prompt,
-        model: engine,
-        maxTokens: maxTokens,
-        temperature: temperature,
-        bestOf: bestOf,
-        echo: echo,
-        frequencyPenalty: frequencyPenalty,
-        logitBias: logitBias,
-        logprobs: logProbs,
-        n: n,
-        presencePenalty: presencePenalty,
-        stop: stop,
-        stream: stream,
-        topP: topP);
+    var data = CompletionApiParameters(
+      prompt,
+      model: engine,
+      maxTokens: maxTokens,
+      temperature: temperature,
+      bestOf: bestOf,
+      topP: topP,
+      echo: echo,
+      frequencyPenalty: frequencyPenalty,
+      presencePenalty: presencePenalty,
+      logitBias: logitBias,
+      logprobs: logProbs,
+      n: n,
+      stop: stop,
+      stream: stream,
+      suffix: suffix,
+      user: user,
+    );
 
     var reqData = data.toJson();
     print(reqData);

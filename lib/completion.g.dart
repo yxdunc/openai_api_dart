@@ -10,12 +10,6 @@ Map<String, dynamic> _$CompletionApiParametersToJson(
     CompletionApiParameters instance) {
   final val = <String, dynamic>{
     'prompt': instance.prompt,
-    'model': _$EngineEnumMap[instance.model],
-    'max_tokens': instance.maxTokens,
-    'temperature': instance.temperature,
-    'top_p': instance.topP,
-    'n': instance.n,
-    'stream': instance.stream,
   };
 
   void writeNotNull(String key, dynamic value) {
@@ -24,6 +18,14 @@ Map<String, dynamic> _$CompletionApiParametersToJson(
     }
   }
 
+  writeNotNull('suffix', instance.suffix);
+  writeNotNull('user', instance.user);
+  val['model'] = _$EngineEnumMap[instance.model];
+  val['max_tokens'] = instance.maxTokens;
+  val['temperature'] = instance.temperature;
+  val['top_p'] = instance.topP;
+  val['n'] = instance.n;
+  val['stream'] = instance.stream;
   writeNotNull('logprobs', instance.logprobs);
   val['echo'] = instance.echo;
   writeNotNull('stop', instance.stop);

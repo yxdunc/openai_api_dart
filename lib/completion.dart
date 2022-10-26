@@ -6,23 +6,28 @@ part 'completion.g.dart';
 
 @JsonSerializable(createFactory: false)
 class CompletionApiParameters {
-  CompletionApiParameters(this.prompt, {
+  CompletionApiParameters(
+    this.prompt, {
     this.model = Engine.text_davinci_002,
-      this.maxTokens = 16,
-      this.temperature = 1,
-      this.topP = 1,
-      this.n = 1,
-      this.stream = false,
-      this.logprobs,
-      this.echo = false,
-      this.stop,
-      this.presencePenalty = 0,
-      this.frequencyPenalty = 0,
-      this.bestOf = 1,
-      this.logitBias,
+    this.suffix,
+    this.user,
+    this.maxTokens = 16,
+    this.temperature = 1,
+    this.topP = 1,
+    this.n = 1,
+    this.stream = false,
+    this.logprobs,
+    this.echo = false,
+    this.stop,
+    this.presencePenalty = 0,
+    this.frequencyPenalty = 0,
+    this.bestOf = 1,
+    this.logitBias,
   });
 
   final String prompt;
+  final String? suffix;
+  final String? user;
   final Engine model;
   final int maxTokens;
   final num temperature;
