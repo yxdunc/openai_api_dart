@@ -85,7 +85,7 @@ class GPT3 {
     var reqData = data.toJson();
     print(reqData);
     var response = await _postHttpCall(_getUri('completions'), reqData);
-    Map<String, dynamic> map = json.decode(response.body);
+    Map<String, dynamic> map = json.decode(Utf8Decoder().convert(response.body.codeUnits));
     _catchExceptions(map);
     return CompletionApiResult.fromJson(map);
   }

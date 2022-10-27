@@ -26,6 +26,10 @@ void main() {
       expect(result.model, 'text-babbage-001');
     });
 
+    test('retrieve correctly encoded response', () async {
+      var result = await api!.completion('I digest utf8', maxTokens: 1, engine: Engine.text_babbage_001);
+    });
+
     test('logprobs are not null when the parameter logProbs is given.',
         () async {
       var result = await api!.completion('How to write efficient tests?',
