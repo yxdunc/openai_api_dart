@@ -168,6 +168,18 @@ enum Engine {
   text_babbage_001,
   @JsonValue('text-curie-001')
   text_curie_001,
+  @JsonValue('text-davinci-001')
+  text_davinci_001,
   @JsonValue('text-davinci-002')
   text_davinci_002,
+  @JsonValue('text-davinci-instruct-beta')
+  text_davinci_instruct_beta,
+  @JsonValue('text-davinci')
+  text_davinci,
+  @JsonValue('text-curie')
+  text_curie,
+  @JsonValue('text-ada')
+  text_ada,
+  @JsonValue('text-babbage')
+  text_babbage,
 }
